@@ -41,7 +41,7 @@ jobs:
       - name: yarn install, build, and test
         run: |
           yarn install --non-interactive --frozen-lockfile
-          yarn build
+          yarn build:api
           yarn prisma generate
           yarn prisma migrate deploy
           yarn test:api
