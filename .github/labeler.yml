@@ -1,0 +1,6 @@
+backend:
+  - apps/backend/**/*
+frontend:
+  - apps/frontend/**/*
+lambda:
+  - apps/lambda/**/*

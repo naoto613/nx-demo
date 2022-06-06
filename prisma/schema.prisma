@@ -1,0 +1,61 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+generator nestgraphql {
+  provider               = "node node_modules/prisma-nestjs-graphql"
+  output                 = "../apps/backend/src/infrastructure/prisma/@generated"
+  fields_Validator_from  = "class-validator"
+  fields_Validator_input = true
+  decorate_1_type        = "Create*Args"
+  decorate_1_field       = data
+  decorate_1_name        = ValidateNested
+  decorate_1_from        = "class-validator"
+  decorate_1_arguments   = "[]"
+  decorate_2_type        = "Create*Args"
+  decorate_2_field       = data
+  decorate_2_name        = Type
+  decorate_2_from        = "class-transformer"
+  decorate_2_arguments   = "['() => {propertyType.0}']"
+  decorate_3_type        = "Update*Args"
+  decorate_3_field       = data
+  decorate_3_name        = ValidateNested
+  decorate_3_from        = "class-validator"
+  decorate_3_arguments   = "[]"
+  decorate_4_type        = "Update*Args"
+  decorate_4_field       = data
+  decorate_4_name        = Type
+  decorate_4_from        = "class-transformer"
+  decorate_4_arguments   = "['() => {propertyType.0}']"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  /// @Field(() => ID)
+  id                 Int       @id @default(autoincrement())
+  /// @Validator.IsEmail()
+  email              String    @unique
+  /// @Validator.IsNotEmpty()
+  name               String
+  /// @Validator.IsOptional()
+  /// @Validator.Min(1)
+  age                Int?
+  /// @HideField({ input: true, output: true })
+  createdAt          DateTime  @default(dbgenerated("NOW()")) @db.Timestamp(0)
+  /// @HideField({ input: true, output: true })
+  updatedAt          DateTime  @default(dbgenerated("NOW() ON UPDATE CURRENT_TIMESTAMP")) @db.Timestamp(0)
+  /// @Field(() => Authority)
+  authority          Authority @default(THIRD)
+  /// @HideField({ input: true, output: true })
+  hashedRefreshToken String?
+}
+
+enum Authority {
+  FIRST
+  SECOND
+  THIRD
+}

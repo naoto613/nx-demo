@@ -1,0 +1,77 @@
+#==================================================
+
+# Package install Layer
+
+FROM node:16.14-slim as node_modules
+
+WORKDIR /app
+
+COPY package.json yarn.lock ./
+
+RUN yarn install --non-interactive --frozen-lockfile --production
+
+#==================================================
+
+# Build Layer
+
+FROM node:16.14-slim as build
+
+WORKDIR /app
+
+# prisma generate に必要
+
+RUN apt-get -qy update && \
+ apt-get -qy install \
+ openssl --no-install-recommends && \
+ apt-get clean && \
+ rm -rf /var/lib/apt/lists/\*
+
+COPY package.json yarn.lock ./
+
+RUN yarn install --non-interactive --frozen-lockfile
+
+COPY . .
+
+RUN yarn build:api && yarn prisma generate
+
+#==================================================
+
+# Run Layer
+
+# distroless は軽量だが openssl のインストールができず、入れる労力に見合わないため docker 公式推奨の slim を使う
+
+# 参考 https://hub.docker.com/_/node https://zenn.dev/unasuke/articles/5ee6e2067ab1ba
+
+# FROM gcr.io/distroless/nodejs:16
+
+FROM node:16.14-slim
+
+WORKDIR /app
+
+# パフォーマンスやセキュリティ関連の最適化を有効にするため
+
+ENV NODE_ENV=production
+
+# prisma の実行に必要
+
+RUN apt-get -qy update && \
+ apt-get -qy install \
+ openssl --no-install-recommends && \
+ apt-get clean && \
+ rm -rf /var/lib/apt/lists/\*
+
+# 非 root 権限ユーザーの追加
+
+RUN useradd -m myuser && chown -R myuser /app
+
+COPY --from=build --chown=myuser:myuser /app/dist /app/dist
+COPY --from=node_modules /app/node_modules /app/node_modules
+
+# prisma generate で生成したものを copy
+
+# devDependencies が必要なため--from=build から copy する
+
+COPY --from=build /app/node_modules/@prisma/client /app/node_modules/@prisma/client
+COPY --from=build /app/node_modules/.prisma/client /app/node_modules/.prisma/client
+
+USER myuser

@@ -1,0 +1,38 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type UserModel {
+  id: ID!
+  email: String!
+  name: String!
+  age: Int
+  authority: Authority!
+}
+
+enum Authority {
+  FIRST
+  SECOND
+  THIRD
+}
+
+type Query {
+  users(searchInput: SearchInput, skip: Float, take: Float): [UserModel!]
+}
+
+input SearchInput {
+  email: String
+  name: String
+  authority: String
+}
+
+type Mutation {
+  createUser(data: UserCreateInput!): UserModel!
+}
+
+input UserCreateInput {
+  email: String!
+  name: String!
+  age: Int
+  authority: Authority
+}
