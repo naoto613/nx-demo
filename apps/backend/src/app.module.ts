@@ -14,7 +14,7 @@ import { ComplexityPlugin } from './infrastructure/plugins/complexity.plugin';
         process.cwd(),
         'apps/backend/src/infrastructure/prisma/schema.gql',
       ),
-      // corsの設定が必要な場合
+      // corsの設定が必要な場合は設定
       // cors: {
       //   origin: process.env.ORIGINS?.split(','),
       //   credentials: true,
