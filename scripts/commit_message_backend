@@ -1,0 +1,32 @@
+#!/bin/sh
+
+echo "backend関連ファイルのコミットメッセージを作成します"
+echo "リリースの種類を番号で選択してください"
+select release_type in patch minor major
+do
+  if [ -z "$release_type" ]; then
+    echo '番号が不正です'
+    exit
+  fi  
+  break
+done
+
+echo "リリースの種類: $release_type"
+
+echo "コミットの種類を番号で選択してください"
+
+select commit_type in chore feat test fix docs ci refactor style 
+do
+  if [ -z "$commit_type" ]; then
+    echo '番号が不正です'
+    exit
+  fi  
+  break
+done
+
+echo "コミットの種類: $commit_type"
+
+echo "変更内容を入力してください"
+read content
+
+git commit -m "$release_type-$commit_type(backend) $content"
