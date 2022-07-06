@@ -3,7 +3,7 @@
 echo "frontend関連ファイルのコミットメッセージを作成します"
 echo "コミットの種類を番号で選択してください"
 
-select commit_type in chore feat test fix docs ci refactor style 
+select commit_type in chore feat test fix docs ci refactor revert style 
 do
   if [ -z "$commit_type" ]; then
     echo '番号が不正です'
