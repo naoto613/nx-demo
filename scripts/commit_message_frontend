@@ -1,0 +1,20 @@
+#!/bin/sh
+
+echo "frontend関連ファイルのコミットメッセージを作成します"
+echo "コミットの種類を番号で選択してください"
+
+select commit_type in chore feat test fix docs ci refactor style 
+do
+  if [ -z "$commit_type" ]; then
+    echo '番号が不正です'
+    exit
+  fi  
+  break
+done
+
+echo "コミットの種類: $commit_type"
+
+echo "変更内容を入力してください"
+read content
+
+git commit -m "$commit_type(frontend): $content"

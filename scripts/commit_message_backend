@@ -29,4 +29,4 @@ echo "コミットの種類: $commit_type"
 echo "変更内容を入力してください"
 read content
 
-git commit -m "$release_type-$commit_type(backend) $content"
+git commit -m "$release_type-$commit_type(backend): $content"
