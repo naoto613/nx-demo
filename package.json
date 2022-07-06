@@ -8,6 +8,7 @@
     "test:api": "dotenv -e .env.test nx test backend",
     "generate": "prisma generate && eslint \"apps/backend/src/infrastructure/prisma/@generated/**/*.ts\" --fix",
     "migrate": "prisma migrate deploy && dotenv -e .env.test prisma migrate deploy",
+    "commit:front": "scripts/commit_message_frontend",
     "commit:back": "scripts/commit_message_backend"
   },
   "prisma": {
