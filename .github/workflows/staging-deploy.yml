@@ -38,7 +38,7 @@ jobs:
 
       - name: Get version
         id: get_version
-        run: echo ::set-output name=VERSION::${{ git describe --tags --abbrev=0 }}
+        run: echo ::set-output name=VERSION::$(git describe --tags --abbrev=0)
 
       - name: Test2
         run: echo ${{ steps.get_version.outputs.VERSION }}
