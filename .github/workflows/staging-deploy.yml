@@ -21,10 +21,10 @@ jobs:
         id: get_version
         run: |
           if [ ${{ github.event.inputs.ref != '' }} ]; then
-              echo ::set-output name=VERSION::${ github.event.inputs.ref }
+              echo ::set-output name=VERSION::${{ github.event.inputs.ref }}
           else
               git fetch --prune --unshallow
-              echo ::set-output name=VERSION::${ git describe --tags --abbrev=0 }
+              echo ::set-output name=VERSION::${{ git describe --tags --abbrev=0 }}
           fi
 
       - name: Checkout Target Tag Version
