@@ -17,6 +17,11 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Checkout Latest tag # ← ここから4行を追加
+        run: |
+          git fetch --prune --unshallow
+          git checkout $(git describe --tags --abbrev=0)
+
       - name: Get version
         id: get_version
         run: |
