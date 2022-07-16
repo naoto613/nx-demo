@@ -1,0 +1,29 @@
+name: Staging Deploy
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'リリース対象のタグ'
+        required: false
+        default: ''
+      branches: [main]
+jobs:
+  deploy:
+    name: Deploy Staging
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      # - run: git checkout ${{ github.event.inputs.ref }}
+      #   if: ${{ github.event.inputs.ref != '' }}
+      - name: Set a variable
+        id: tag
+        run: |
+          echo "::set-output name=names::${{ git fetch --prune --unshallow --tags }}"
+      - name: Check a variable
+        run: |
+          echo ${{ steps.tags.outputs.names }}
+      - name: export
+        run: |
+          echo ${{ github.event.inputs.ref }}
