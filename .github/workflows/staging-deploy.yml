@@ -24,7 +24,8 @@ jobs:
               echo ::set-output name=VERSION::${{ github.event.inputs.ref }}
           else
               git fetch --prune --unshallow
-              echo ::set-output name=VERSION::${{ git describe --tags --abbrev=0 }}
+              CURRENT_VERSION = git describe --tags --abbrev=0
+              echo ::set-output name=VERSION::$CURRENT_VERSION
           fi
 
       - name: Checkout Target Tag Version
