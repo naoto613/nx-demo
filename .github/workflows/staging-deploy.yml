@@ -28,6 +28,11 @@ jobs:
               echo ::set-output name=VERSION::$CURRENT_VERSION
           fi
 
+      - name: Test
+        env:
+          VERSION: ${{ steps.get_version.outputs.VERSION }}
+        run: echo ${ VERSION }
+
       - name: Checkout Target Tag Version
         env:
           VERSION: ${{ steps.get_version.outputs.VERSION }}
