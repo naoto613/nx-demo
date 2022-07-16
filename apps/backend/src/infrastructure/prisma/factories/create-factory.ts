@@ -45,6 +45,7 @@ export const createFactory = <CreateInputType, ModelType>(
         ...attrs,
       };
 
+      // anyにはdefaultから変更したい項目が入ってくる
       const options: Record<string, any> = {};
       const includes = buildPrismaIncludeFromAttrs(attrs);
       if (includes) options.include = includes;

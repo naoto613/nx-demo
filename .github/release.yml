@@ -1,0 +1,17 @@
+changelog:
+  categories:
+    - title: 🚀 New Features
+      labels:
+        - feature
+    - title: 🌍 Environment
+      labels:
+        - environment
+    - title: 🐛 Bug Fixes
+      labels:
+        - bug
+    - title: 📚 Documentation
+      labels:
+        - documentation
+    - title: Other Changes
+      labels:
+        - '*'
