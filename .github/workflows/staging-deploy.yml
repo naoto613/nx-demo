@@ -46,12 +46,12 @@ jobs:
       - name: Test
         env:
           VERSION: ${{ steps.get_version.outputs.VERSION }}
-        run: echo ${ process.env.VERSION }
+        run: echo ${ VERSION }
 
       - name: Checkout Target Tag Version
         env:
           VERSION: ${{ steps.get_version.outputs.VERSION }}
-        run: git checkout ${ process.env.VERSION }
+        run: git checkout ${ VERSION }
 
       - name: Push branch
         env:
