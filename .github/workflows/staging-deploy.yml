@@ -17,21 +17,28 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Checkout Target Tag Version
-        run: git checkout ${{ github.event.inputs.ref }}
-        if: ${{ github.event.inputs.ref != '' }}
-
       - name: Get version
         id: get_version
-        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\/v/}
+        run: |
+          if [ ${{ github.event.inputs.ref != '' }} ]; then
+              echo ::set-output name=VERSION::${ github.event.inputs.ref }
+          else
+              git fetch --prune --unshallow
+              echo ::set-output name=VERSION::${ git describe --tags --abbrev=0 }
+          fi
+
+      - name: Checkout Target Tag Version
+        env:
+          VERSION: ${{ steps.get_version.outputs.VERSION }}
+        run: git checkout ${ VERSION }
 
       - name: Push branch
         env:
           BRANCH: staging
           VERSION: ${{ steps.get_version.outputs.VERSION }}
         run: |
-          git switch -c ${BRANCH}-v${VERSION} origin/main
-          git push -u origin ${BRANCH}-v${VERSION}
+          git switch -c ${BRANCH}-${VERSION} origin/main
+          git push -u origin ${BRANCH}-${VERSION}
       - name: Create pull request
         uses: actions/github-script@v6
         env:
