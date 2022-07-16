@@ -17,27 +17,19 @@ jobs:
         with:
           fetch-depth: 0
 
-      # - name: Checkout Latest tag # ← ここから4行を追加
-      #   run: |
-      #     git fetch --tags
-      #     git checkout $(git describe --tags --abbrev=0)
-
-      - name: Fetch Tags
-        run: git fetch --tags
-
-      - name: Get version
+      # - name: Fetch Tags
+      #   run: git fetch --tags
+      - name: Get Selected Version
         id: get_version
-        run: |
-          if [ ${{ github.event.inputs.ref != '' }} ]; then
-              echo ::set-output name=VERSION::${{ github.event.inputs.ref }}
-          else
-              git fetch --tags
-              echo ::set-output name=VERSION::$(git describe --tags --abbrev=0)
-          fi
+        if: ${{ github.event.inputs.ref != '' }}
+        run: echo ::set-output name=VERSION::${{ github.event.inputs.ref }}
 
-      # - name: Get version
-      #   id: get_version
-      #   run: echo ::set-output name=VERSION::$(git describe --tags --abbrev=0)
+      - name: Get Current Version
+        id: get_version
+        if: ${{ github.event.inputs.ref == '' }}
+        run: |
+          git fetch --tags
+          echo ::set-output name=VERSION::$(git describe --tags --abbrev=0)
 
       - name: Test2
         run: echo ${{ steps.get_version.outputs.VERSION }}
