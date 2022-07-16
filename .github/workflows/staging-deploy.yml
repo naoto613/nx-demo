@@ -38,7 +38,7 @@ jobs:
           BRANCH: staging
           VERSION: ${{ steps.get_version.outputs.VERSION }}
         with:
-          github-token: ${{ secrets.VEGA_BOT_API_TOKEN }}
+          # github-token: ${{ secrets.VEGA_BOT_API_TOKEN }}
           script: |
             github.rest.pulls.create({
               owner: context.repo.owner,
