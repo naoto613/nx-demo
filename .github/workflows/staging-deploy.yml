@@ -17,8 +17,8 @@ jobs:
         with:
           fetch-depth: 0
 
-      # - name: Fetch Tags
-      #   run: git fetch --tags
+      - name: Fetch Tags
+        run: git fetch --tags
 
       - name: Get version
         id: get_version
@@ -26,7 +26,6 @@ jobs:
           if [ ${{ github.event.inputs.ref != '' }} ]; then
               echo ::set-output name=VERSION::${{ github.event.inputs.ref }}
           else
-              git fetch --tags
               echo ::set-output name=VERSION::$(git describe --tags --abbrev=0)
           fi
 
@@ -58,6 +57,16 @@ jobs:
               repo: context.repo.repo,
               title: `bump ${process.env.BRANCH} v${process.env.VERSION}`,
               body: `Bump ${process.env.BRANCH} v${process.env.VERSION}`,
-              head: `${context.repo.owner}:${process.env.BRANCH}-v${process.env.VERSION}`,
+              head: `${process.env.BRANCH}-v${process.env.VERSION}`,
               base: process.env.BRANCH
             })
+
+# script: |
+#             github.rest.pulls.create({
+#               owner: context.repo.owner,
+#               repo: context.repo.repo,
+#               title: `bump ${process.env.BRANCH} v${process.env.VERSION}`,
+#               body: `Bump ${process.env.BRANCH} v${process.env.VERSION}`,
+#               head: `${context.repo.owner}:${process.env.BRANCH}-v${process.env.VERSION}`,
+#               base: process.env.BRANCH
+#             })
