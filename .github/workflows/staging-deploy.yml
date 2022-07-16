@@ -19,23 +19,24 @@ jobs:
 
       # - name: Fetch Tags
       #   run: git fetch --tags
-      - name: Get Selected Version
-        id: get_version
-        if: ${{ github.event.inputs.ref != '' }}
-        run: echo ::set-output name=VERSION::${{ github.event.inputs.ref }}
 
-      - name: Get Current Version
+      - name: Get version
         id: get_version
-        if: ${{ github.event.inputs.ref == '' }}
         run: |
-          git fetch --tags
-          echo ::set-output name=VERSION::$(git describe --tags --abbrev=0)
+          if [ ${{ github.event.inputs.ref != '' }} ]; then
+              echo ::set-output name=VERSION::${{ github.event.inputs.ref }}
+          else
+              git fetch --tags
+              echo ::set-output name=VERSION::$(git describe --tags --abbrev=0)
+          fi
 
-      - name: Test2
+      - name: Test
         run: echo ${{ steps.get_version.outputs.VERSION }}
 
       - name: Checkout Target Tag Version
-        run: git checkout ${{ steps.get_version.outputs.VERSION }}
+        env:
+          VERSION: ${{ steps.get_version.outputs.VERSION }}
+        run: git checkout ${VERSION}
 
       - name: Push branch
         env:
