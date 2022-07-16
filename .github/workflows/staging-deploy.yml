@@ -28,15 +28,18 @@ jobs:
               echo ::set-output name=VERSION::$CURRENT_VERSION
           fi
 
+      - name: Test2
+        run: echo ${{ steps.get_version.outputs.VERSION }}
+
       - name: Test
         env:
           VERSION: ${{ steps.get_version.outputs.VERSION }}
-        run: echo ${ VERSION }
+        run: echo ${ process.env.VERSION }
 
       - name: Checkout Target Tag Version
         env:
           VERSION: ${{ steps.get_version.outputs.VERSION }}
-        run: git checkout ${ VERSION }
+        run: git checkout ${ process.env.VERSION }
 
       - name: Push branch
         env:
