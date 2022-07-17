@@ -1,11 +1,11 @@
-name: Staging Deploy
+name: Production Deploy
 
 on:
   workflow_dispatch:
-    branches: [main]
+    branches: [staging]
 jobs:
   deploy:
-    name: Deploy staging
+    name: Deploy production
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -22,13 +22,12 @@ jobs:
         env:
           CURRENT_VERSION: ${{ steps.current_version.outputs.VERSION }}
         run: |
-          git switch -c release/staging-${CURRENT_VERSION} origin/main
-          git reset --hard ${CURRENT_VERSION}
+          git switch -c release/production-${CURRENT_VERSION} origin/staging
 
       - name: Push branch
         env:
           CURRENT_VERSION: ${{ steps.current_version.outputs.VERSION }}
-        run: git push -u origin release/staging-${CURRENT_VERSION} -f
+        run: git push -u origin release/production-${CURRENT_VERSION}
 
       - name: Create pull request
         uses: actions/github-script@v6
@@ -40,10 +39,10 @@ jobs:
             github.rest.pulls.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title: `Bump staging ${process.env.CURRENT_VERSION}`,
-              body: `Bump staging ${process.env.CURRENT_VERSION}`,
-              head: `release/staging-${process.env.CURRENT_VERSION}`,
-              base: 'staging'
+              title: `Bump production ${process.env.CURRENT_VERSION}`,
+              body: `Bump production ${process.env.CURRENT_VERSION}`,
+              head: `release/production-${process.env.CURRENT_VERSION}`,
+              base: 'production'
             })
 
 # script: |
