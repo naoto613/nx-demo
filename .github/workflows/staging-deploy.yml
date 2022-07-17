@@ -48,10 +48,12 @@ jobs:
           CURRENT_VERSION: ${{ steps.current_version.outputs.VERSION }}
           INPUT_VERSION: ${{ steps.input_version.outputs.VERSION }}
         run: |
-          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-          git commit -m "chore(other): Revert to ${CURRENT_VERSION}${INPUT_VERSION}"
-        if: steps.changes.outputs.count > 0
+          if ! git diff --exit-code --quiet
+          then
+           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+           git config --local user.name "github-actions[bot]"
+           git commit -m "chore(other): Revert to ${CURRENT_VERSION}${INPUT_VERSION}"
+          fi
 
       - name: Push branch
         env:
@@ -73,7 +75,7 @@ jobs:
               title: `Bump staging ${process.env.CURRENT_VERSION}${process.env.INPUT_VERSION}`,
               body: `Bump staging ${process.env.CURRENT_VERSION}${process.env.INPUT_VERSION}`,
               head: `staging-${process.env.CURRENT_VERSION}${process.env.INPUT_VERSION}`,
-              base: process.env.BRANCH
+              base: staging
             })
 
 # script: |
