@@ -2,11 +2,6 @@ name: Staging Deploy
 
 on:
   workflow_dispatch:
-    inputs:
-      ref:
-        description: 'リリース対象のタグ（未入力の場合最新タグ）'
-        required: false
-        default: ''
     branches: [main]
 jobs:
   deploy:
@@ -23,59 +18,32 @@ jobs:
         run: |
           git fetch --tags
           echo ::set-output name=VERSION::$( git describe --tags --abbrev=0)
-        if: ${{ github.event.inputs.ref == '' }}
-
-      - name: Get input version
-        id: input_version
-        run: |
-          echo ::set-output name=VERSION::${{ github.event.inputs.ref }}
-        if: ${{ github.event.inputs.ref != '' }}
 
       - name: Switch to target version
         env:
           CURRENT_VERSION: ${{ steps.current_version.outputs.VERSION }}
-          INPUT_VERSION: ${{ steps.input_version.outputs.VERSION }}
         run: |
-          git switch -c staging-${CURRENT_VERSION}${INPUT_VERSION} origin/main
-          git reset --hard ${CURRENT_VERSION}${INPUT_VERSION}
-
-      - name: Revert to target version
-        run: |
-          git reset --soft HEAD@{1}
-        if: ${{ github.event.inputs.ref != '' }}
-
-      - name: Commit diff
-        env:
-          CURRENT_VERSION: ${{ steps.current_version.outputs.VERSION }}
-          INPUT_VERSION: ${{ steps.input_version.outputs.VERSION }}
-        run: |
-          if ! git diff --exit-code --quiet
-          then
-           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
-           git config --local user.name "github-actions[bot]"
-           git commit -m "chore(other): Revert to ${CURRENT_VERSION}${INPUT_VERSION}"
-          fi
+          git switch -c release/staging-${CURRENT_VERSION} origin/main
+          git reset --hard ${CURRENT_VERSION}
 
       - name: Push branch
         env:
           CURRENT_VERSION: ${{ steps.current_version.outputs.VERSION }}
-          INPUT_VERSION: ${{ steps.input_version.outputs.VERSION }}
-        run: git push -u origin staging-${CURRENT_VERSION}${INPUT_VERSION} -f
+        run: git push -u origin release/staging-${CURRENT_VERSION} -f
 
       - name: Create pull request
         uses: actions/github-script@v6
         env:
           CURRENT_VERSION: ${{ steps.current_version.outputs.VERSION }}
-          INPUT_VERSION: ${{ steps.input_version.outputs.VERSION }}
         with:
           # github-token: ${{ secrets.VEGA_BOT_API_TOKEN }}
           script: |
             github.rest.pulls.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title: `Bump staging ${process.env.CURRENT_VERSION}${process.env.INPUT_VERSION}`,
-              body: `Bump staging ${process.env.CURRENT_VERSION}${process.env.INPUT_VERSION}`,
-              head: `staging-${process.env.CURRENT_VERSION}${process.env.INPUT_VERSION}`,
+              title: `Bump staging ${process.env.CURRENT_VERSION}`,
+              body: `Bump staging ${process.env.CURRENT_VERSION}`,
+              head: `release/staging-${process.env.CURRENT_VERSION}`,
               base: staging
             })
 
