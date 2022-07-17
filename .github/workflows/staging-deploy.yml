@@ -36,6 +36,7 @@ jobs:
           CURRENT_VERSION: ${{ steps.current_version.outputs.VERSION }}
           INPUT_VERSION: ${{ steps.input_version.outputs.VERSION }}
         run: |
+          git fetch --tags
           git switch -c ${BRANCH}-${CURRENT_VERSION}${INPUT_VERSION} origin/main
           git reset --hard ${CURRENT_VERSION}${INPUT_VERSION}
           git push -u origin ${BRANCH}-${CURRENT_VERSION}${INPUT_VERSION} -f
