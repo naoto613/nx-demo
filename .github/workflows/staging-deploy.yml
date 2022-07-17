@@ -10,30 +10,25 @@ on:
     branches: [main]
 jobs:
   deploy:
-    name: Deploy staging
+    name: Deploy Staging
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
-      - name: Get current version
+      - name: Get Current Version
         id: current_version
         run: |
           git fetch --tags
           echo ::set-output name=VERSION::$( git describe --tags --abbrev=0)
         if: ${{ github.event.inputs.ref == '' }}
 
-      - name: Get input version
+      - name: Get Input Version
         id: input_version
         run: |
           echo ::set-output name=VERSION::${{ github.event.inputs.ref }}
         if: ${{ github.event.inputs.ref != '' }}
-
-      - name: Git config
-        run: |
-          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
 
       - name: Push branch
         env:
@@ -43,10 +38,7 @@ jobs:
         run: |
           git switch -c ${BRANCH}-${CURRENT_VERSION}${INPUT_VERSION} origin/main
           git reset --hard ${CURRENT_VERSION}${INPUT_VERSION}
-          git reset --soft HEAD@{1}
-          git commit -m "chore(other): Revert to ${CURRENT_VERSION}${INPUT_VERSION}"
-          git push -u origin ${BRANCH}-${CURRENT_VERSION}${INPUT_VERSION} -f
-
+          git push -u origin ${BRANCH}-${CURRENT_VERSION}${INPUT_VERSION}
       - name: Create pull request
         uses: actions/github-script@v6
         env:
