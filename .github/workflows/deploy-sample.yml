@@ -1,4 +1,4 @@
-name: Staging Deploy
+name: Deploy Sample
 
 on:
   workflow_dispatch:
@@ -10,7 +10,7 @@ on:
     branches: [main]
 jobs:
   deploy:
-    name: Deploy staging
+    name: Deploy sample
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
