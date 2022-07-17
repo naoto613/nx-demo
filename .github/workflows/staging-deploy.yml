@@ -30,29 +30,16 @@ jobs:
           echo ::set-output name=VERSION::${{ github.event.inputs.ref }}
         if: ${{ github.event.inputs.ref != '' }}
 
-      - name: Switch branch
-        env:
-          BRANCH: staging
-          CURRENT_VERSION: ${{ steps.current_version.outputs.VERSION }}
-          INPUT_VERSION: ${{ steps.input_version.outputs.VERSION }}
-        run: |
-          git switch -c ${BRANCH}-${CURRENT_VERSION}${INPUT_VERSION} origin/main
-
-      - name: Reset branch
-        env:
-          BRANCH: staging
-          CURRENT_VERSION: ${{ steps.current_version.outputs.VERSION }}
-          INPUT_VERSION: ${{ steps.input_version.outputs.VERSION }}
-        run: |
-          git fetch --tags
-          git reset --hard ${CURRENT_VERSION}${INPUT_VERSION}
-
       - name: Push branch
         env:
           BRANCH: staging
           CURRENT_VERSION: ${{ steps.current_version.outputs.VERSION }}
           INPUT_VERSION: ${{ steps.input_version.outputs.VERSION }}
         run: |
+          git switch -c ${BRANCH}-${CURRENT_VERSION}${INPUT_VERSION} origin/main
+          git reset --hard ${CURRENT_VERSION}${INPUT_VERSION}
+          git reset --soft HEAD@{1}
+          git commit -m `chore(other): Revert to ${CURRENT_VERSION}${INPUT_VERSION}`
           git push -u origin ${BRANCH}-${CURRENT_VERSION}${INPUT_VERSION} -f
 
       - name: Create pull request
