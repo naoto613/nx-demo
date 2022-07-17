@@ -17,16 +17,13 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Fetch Tags
-        run: git fetch --tags
-
       - name: Get version
         id: get_version
         run: |
           if [ ${{ github.event.inputs.ref != '' }} ]; then
               echo ::set-output name=VERSION::${{ github.event.inputs.ref }}
           else
-              echo ::set-output name=VERSION::$(git describe --tags --abbrev=0)
+              git fetch --tags && echo ::set-output name=VERSION::$( git describe --tags --abbrev=0)
           fi
 
       - name: Test
