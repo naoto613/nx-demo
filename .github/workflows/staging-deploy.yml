@@ -42,7 +42,7 @@ jobs:
           VERSION: ${{ steps.get_version.outputs.VERSION }}
         run: |
           git switch -c ${BRANCH}-${VERSION} origin/main
-          git checkout ${VERSION}
+          git reset --hard ${VERSION}
           git push -u origin ${BRANCH}-${VERSION}
       - name: Create pull request
         uses: actions/github-script@v6
