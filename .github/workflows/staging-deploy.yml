@@ -38,7 +38,7 @@ jobs:
         run: |
           git switch -c ${BRANCH}-${CURRENT_VERSION}${INPUT_VERSION} origin/main
           git reset --hard ${CURRENT_VERSION}${INPUT_VERSION}
-          git push -u origin ${BRANCH}-${CURRENT_VERSION}${INPUT_VERSION}
+          git push -u origin ${BRANCH}-${CURRENT_VERSION}${INPUT_VERSION} -f
       - name: Create pull request
         uses: actions/github-script@v6
         env:
