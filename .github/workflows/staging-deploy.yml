@@ -6,7 +6,7 @@ on:
       ref:
         description: 'リリース対象のタグ'
         required: false
-        default: ''
+        default: git fetch --tags && echo ::set-output name=VERSION::$( git describe --tags --abbrev=0)
     branches: [main]
 jobs:
   deploy:
@@ -27,11 +27,11 @@ jobs:
       - name: Get version
         id: get_version
         run: |
-          git fetch --tags
-          echo ::set-output name=VERSION::$(git describe --tags --abbrev=0)
-        if: ${{ github.event.inputs.ref == '' }}
-        run: echo ::set-output name=VERSION::${{ github.event.inputs.ref }}
-        if: ${{ github.event.inputs.ref != '' }}
+          if [ ${{ github.event.inputs.ref != '' }} ]; then
+              echo ::set-output name=VERSION::${{ github.event.inputs.ref }}
+          else
+              git fetch --tags && echo ::set-output name=VERSION::$( git describe --tags --abbrev=0)
+          fi
 
       - name: Test
         run: echo ${{ steps.get_version.outputs.VERSION }}
