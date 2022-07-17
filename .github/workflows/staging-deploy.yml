@@ -10,61 +10,39 @@ on:
     branches: [main]
 jobs:
   deploy:
-    name: Deploy staging
+    name: Deploy Staging
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-          token: '${{ secrets.GITHUB_TOKEN }}'
 
-      - name: Get current version
+      - name: Get Current Version
         id: current_version
         run: |
           git fetch --tags
           echo ::set-output name=VERSION::$( git describe --tags --abbrev=0)
         if: ${{ github.event.inputs.ref == '' }}
 
-      - name: Get input version
+      - name: Get Input Version
         id: input_version
         run: |
           echo ::set-output name=VERSION::${{ github.event.inputs.ref }}
         if: ${{ github.event.inputs.ref != '' }}
 
-      - name: Switch to target version
-        env:
-          CURRENT_VERSION: ${{ steps.current_version.outputs.VERSION }}
-          INPUT_VERSION: ${{ steps.input_version.outputs.VERSION }}
-        run: |
-          git switch -c staging-${CURRENT_VERSION}${INPUT_VERSION} origin/main
-          git reset --hard ${CURRENT_VERSION}${INPUT_VERSION}
-
-      - name: Revert to target version
-        run: |
-          git reset --soft HEAD@{1}
-        if: ${{ github.event.inputs.ref != '' }}
-
-      - name: Commit diff
-        env:
-          CURRENT_VERSION: ${{ steps.current_version.outputs.VERSION }}
-          INPUT_VERSION: ${{ steps.input_version.outputs.VERSION }}
-        run: |
-          if ! git diff --exit-code --quiet
-          then
-           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
-           git config --local user.name "github-actions[bot]"
-           git commit -m "chore(other): Revert to ${CURRENT_VERSION}${INPUT_VERSION}"
-          fi
-
       - name: Push branch
         env:
+          BRANCH: staging
           CURRENT_VERSION: ${{ steps.current_version.outputs.VERSION }}
           INPUT_VERSION: ${{ steps.input_version.outputs.VERSION }}
-        run: git push -u origin staging-${CURRENT_VERSION}${INPUT_VERSION} -f
-
+        run: |
+          git switch -c ${BRANCH}-${CURRENT_VERSION}${INPUT_VERSION} origin/main
+          git reset --hard ${CURRENT_VERSION}${INPUT_VERSION}
+          git push -u origin ${BRANCH}-${CURRENT_VERSION}${INPUT_VERSION}
       - name: Create pull request
         uses: actions/github-script@v6
         env:
+          BRANCH: staging
           CURRENT_VERSION: ${{ steps.current_version.outputs.VERSION }}
           INPUT_VERSION: ${{ steps.input_version.outputs.VERSION }}
         with:
@@ -73,18 +51,18 @@ jobs:
             github.rest.pulls.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title: `Bump staging ${process.env.CURRENT_VERSION}${process.env.INPUT_VERSION}`,
-              body: `Bump staging ${process.env.CURRENT_VERSION}${process.env.INPUT_VERSION}`,
-              head: `staging-${process.env.CURRENT_VERSION}${process.env.INPUT_VERSION}`,
-              base: staging
+              title: `bump ${process.env.BRANCH} ${process.env.CURRENT_VERSION}${process.env.INPUT_VERSION}`,
+              body: `Bump ${process.env.BRANCH} ${process.env.CURRENT_VERSION}${process.env.INPUT_VERSION}`,
+              head: `${process.env.BRANCH}-${process.env.CURRENT_VERSION}${process.env.INPUT_VERSION}`,
+              base: process.env.BRANCH
             })
 
 # script: |
 #             github.rest.pulls.create({
 #               owner: context.repo.owner,
 #               repo: context.repo.repo,
-#               title: `bump staging v${process.env.VERSION}`,
-#               body: `Bump staging v${process.env.VERSION}`,
-#               head: `${context.repo.owner}:staging-v${process.env.VERSION}`,
+#               title: `bump ${process.env.BRANCH} v${process.env.VERSION}`,
+#               body: `Bump ${process.env.BRANCH} v${process.env.VERSION}`,
+#               head: `${context.repo.owner}:${process.env.BRANCH}-v${process.env.VERSION}`,
 #               base: process.env.BRANCH
 #             })
