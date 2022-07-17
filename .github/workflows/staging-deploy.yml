@@ -37,20 +37,18 @@ jobs:
 
       - name: Push branch
         env:
-          BRANCH: staging
           CURRENT_VERSION: ${{ steps.current_version.outputs.VERSION }}
           INPUT_VERSION: ${{ steps.input_version.outputs.VERSION }}
         run: |
-          git switch -c ${BRANCH}-${CURRENT_VERSION}${INPUT_VERSION} origin/main
+          git switch -c staging-${CURRENT_VERSION}${INPUT_VERSION} origin/main
           git reset --hard ${CURRENT_VERSION}${INPUT_VERSION}
           git reset --soft HEAD@{1}
           git commit -m "chore(other): Revert to ${CURRENT_VERSION}${INPUT_VERSION}"
-          git push -u origin ${BRANCH}-${CURRENT_VERSION}${INPUT_VERSION} -f
+          git push -u origin staging-${CURRENT_VERSION}${INPUT_VERSION} -f
 
       - name: Create pull request
         uses: actions/github-script@v6
         env:
-          BRANCH: staging
           CURRENT_VERSION: ${{ steps.current_version.outputs.VERSION }}
           INPUT_VERSION: ${{ steps.input_version.outputs.VERSION }}
         with:
@@ -59,9 +57,9 @@ jobs:
             github.rest.pulls.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title: `bump ${process.env.BRANCH} ${process.env.CURRENT_VERSION}${process.env.INPUT_VERSION}`,
-              body: `Bump ${process.env.BRANCH} ${process.env.CURRENT_VERSION}${process.env.INPUT_VERSION}`,
-              head: `${process.env.BRANCH}-${process.env.CURRENT_VERSION}${process.env.INPUT_VERSION}`,
+              title: `Bump staging ${process.env.CURRENT_VERSION}${process.env.INPUT_VERSION}`,
+              body: `Bump staging ${process.env.CURRENT_VERSION}${process.env.INPUT_VERSION}`,
+              head: `staging-${process.env.CURRENT_VERSION}${process.env.INPUT_VERSION}`,
               base: process.env.BRANCH
             })
 
@@ -69,8 +67,8 @@ jobs:
 #             github.rest.pulls.create({
 #               owner: context.repo.owner,
 #               repo: context.repo.repo,
-#               title: `bump ${process.env.BRANCH} v${process.env.VERSION}`,
-#               body: `Bump ${process.env.BRANCH} v${process.env.VERSION}`,
-#               head: `${context.repo.owner}:${process.env.BRANCH}-v${process.env.VERSION}`,
+#               title: `bump staging v${process.env.VERSION}`,
+#               body: `Bump staging v${process.env.VERSION}`,
+#               head: `${context.repo.owner}:staging-v${process.env.VERSION}`,
 #               base: process.env.BRANCH
 #             })
