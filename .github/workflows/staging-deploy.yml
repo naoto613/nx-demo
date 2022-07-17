@@ -10,25 +10,42 @@ on:
     branches: [main]
 jobs:
   deploy:
-    name: Deploy Staging
+    name: Deploy staging
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
-      - name: Get Current Version
+      - name: Get current version
         id: current_version
         run: |
           git fetch --tags
           echo ::set-output name=VERSION::$( git describe --tags --abbrev=0)
         if: ${{ github.event.inputs.ref == '' }}
 
-      - name: Get Input Version
+      - name: Get input version
         id: input_version
         run: |
           echo ::set-output name=VERSION::${{ github.event.inputs.ref }}
         if: ${{ github.event.inputs.ref != '' }}
+
+      - name: Switch branch
+        env:
+          BRANCH: staging
+          CURRENT_VERSION: ${{ steps.current_version.outputs.VERSION }}
+          INPUT_VERSION: ${{ steps.input_version.outputs.VERSION }}
+        run: |
+          git switch -c ${BRANCH}-${CURRENT_VERSION}${INPUT_VERSION} origin/main
+
+      - name: Reset branch
+        env:
+          BRANCH: staging
+          CURRENT_VERSION: ${{ steps.current_version.outputs.VERSION }}
+          INPUT_VERSION: ${{ steps.input_version.outputs.VERSION }}
+        run: |
+          git fetch --tags
+          git reset --hard ${CURRENT_VERSION}${INPUT_VERSION}
 
       - name: Push branch
         env:
@@ -36,10 +53,8 @@ jobs:
           CURRENT_VERSION: ${{ steps.current_version.outputs.VERSION }}
           INPUT_VERSION: ${{ steps.input_version.outputs.VERSION }}
         run: |
-          git fetch --tags
-          git switch -c ${BRANCH}-${CURRENT_VERSION}${INPUT_VERSION} origin/main
-          git reset --hard ${CURRENT_VERSION}${INPUT_VERSION}
           git push -u origin ${BRANCH}-${CURRENT_VERSION}${INPUT_VERSION} -f
+
       - name: Create pull request
         uses: actions/github-script@v6
         env:
