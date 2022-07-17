@@ -39,7 +39,7 @@ jobs:
           git switch -c ${BRANCH}-${CURRENT_VERSION}${INPUT_VERSION} origin/main
           git reset --hard ${CURRENT_VERSION}${INPUT_VERSION}
           git reset --soft HEAD@{1}
-          git commit -m `chore(other): Revert to ${CURRENT_VERSION}${INPUT_VERSION}`
+          git commit -m "chore(other): Revert to ${CURRENT_VERSION}${INPUT_VERSION}"
           git push -u origin ${BRANCH}-${CURRENT_VERSION}${INPUT_VERSION} -f
 
       - name: Create pull request
