@@ -17,47 +17,49 @@ jobs:
         with:
           fetch-depth: 0
 
-      # - name: Fetch Tags
-      #   run: git fetch --tags
-
-      # - name: Get version
-      #   id: get_version
-      #   run: echo ::set-output name=VERSION::$( git describe --tags --abbrev=0)
-
-      - name: Get version
-        id: get_version
+      - name: Get Current Version
+        id: current_version
         run: |
-          if [ ${{ github.event.inputs.ref != '' }} ]; then
-              echo ::set-output name=VERSION::${{ github.event.inputs.ref }}
-          else
-              git fetch --tags && echo ::set-output name=VERSION::$( git describe --tags --abbrev=0)
-          fi
+          git fetch --tags
+          echo ::set-output name=VERSION::$( git describe --tags --abbrev=0)
+        if: ${{ github.event.inputs.ref == '' }}
+
+      - name: Get Input Version
+        id: input_version
+        run: |
+          echo ::set-output name=VERSION::${{ github.event.inputs.ref }}
+        if: ${{ github.event.inputs.ref != '' }}
 
       - name: Test
-        run: echo ${{ steps.get_version.outputs.VERSION }}
+        run: echo ${{ steps.current_version.outputs.VERSION }}
+
+      - name: Test2
+        run: echo ${{ steps.input_version.outputs.VERSION }}
 
       - name: Push branch
         env:
           BRANCH: staging
-          VERSION: ${{ steps.get_version.outputs.VERSION }}
+          CURRENT_VERSION: ${{ steps.current_version.outputs.VERSION }}
+          INPUT_VERSION: ${{ steps.input_version.outputs.VERSION }}
         run: |
-          git switch -c ${BRANCH}-${VERSION} origin/main
-          git reset --hard ${VERSION}
-          git push -u origin ${BRANCH}-${VERSION}
+          git switch -c ${BRANCH}-${CURRENT_VERSION}${INPUT_VERSION} origin/main
+          git reset --hard ${CURRENT_VERSION}${INPUT_VERSION}
+          git push -u origin ${BRANCH}-${CURRENT_VERSION}${INPUT_VERSION}
       - name: Create pull request
         uses: actions/github-script@v6
         env:
           BRANCH: staging
-          VERSION: ${{ steps.get_version.outputs.VERSION }}
+          CURRENT_VERSION: ${{ steps.current_version.outputs.VERSION }}
+          INPUT_VERSION: ${{ steps.input_version.outputs.VERSION }}
         with:
           # github-token: ${{ secrets.VEGA_BOT_API_TOKEN }}
           script: |
             github.rest.pulls.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title: `bump ${process.env.BRANCH} ${process.env.VERSION}`,
-              body: `Bump ${process.env.BRANCH} ${process.env.VERSION}`,
-              head: `${process.env.BRANCH}-${process.env.VERSION}`,
+              title: `bump ${process.env.BRANCH} ${process.env.CURRENT_VERSION}${process.env.INPUT_VERSION}`,
+              body: `Bump ${process.env.BRANCH} ${process.env.CURRENT_VERSION}${process.env.INPUT_VERSION}`,
+              head: `${process.env.BRANCH}-${process.env.CURRENT_VERSION}${process.env.INPUT_VERSION}`,
               base: process.env.BRANCH
             })
 
