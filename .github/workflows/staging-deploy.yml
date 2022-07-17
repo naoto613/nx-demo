@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       ref:
-        description: 'リリース対象のタグ'
+        description: 'リリース対象のタグ（未入力の場合最新タグ）'
         required: false
         default: ''
     branches: [main]
@@ -29,12 +29,6 @@ jobs:
         run: |
           echo ::set-output name=VERSION::${{ github.event.inputs.ref }}
         if: ${{ github.event.inputs.ref != '' }}
-
-      - name: Test
-        run: echo ${{ steps.current_version.outputs.VERSION }}
-
-      - name: Test2
-        run: echo ${{ steps.input_version.outputs.VERSION }}
 
       - name: Push branch
         env:
