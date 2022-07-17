@@ -18,6 +18,17 @@ jobs:
           git fetch --tags
           echo ::set-output name=VERSION::$( git describe --tags --abbrev=0)
 
+      - name: Switch to target version
+        env:
+          CURRENT_VERSION: ${{ steps.current_version.outputs.VERSION }}
+        run: |
+          git switch -c release/production-${CURRENT_VERSION} origin/staging
+
+      - name: Push branch
+        env:
+          CURRENT_VERSION: ${{ steps.current_version.outputs.VERSION }}
+        run: git push -u origin release/production-${CURRENT_VERSION}
+
       - name: Create pull request
         uses: actions/github-script@v6
         env:
@@ -30,7 +41,7 @@ jobs:
               repo: context.repo.repo,
               title: `Bump production ${process.env.CURRENT_VERSION}`,
               body: `Bump production ${process.env.CURRENT_VERSION}`,
-              head: staging,
+              head: `release/production-${process.env.CURRENT_VERSION}`,
               base: 'production'
             })
 
