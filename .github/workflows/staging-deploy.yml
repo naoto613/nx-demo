@@ -6,7 +6,7 @@ on:
       ref:
         description: 'リリース対象のタグ'
         required: false
-        default: ${{ git fetch --tags && echo ::set-output name=VERSION::$(git describe --tags --abbrev=0) }}
+        default: ''
     branches: [main]
 jobs:
   deploy:
