@@ -54,7 +54,7 @@ jobs:
               repo: context.repo.repo,
               title: `bump ${process.env.BRANCH} v${process.env.VERSION}`,
               body: `Bump ${process.env.BRANCH} v${process.env.VERSION}`,
-              head: `${process.env.BRANCH}-v${process.env.VERSION}`,
+              head: `${process.env.BRANCH}-${process.env.VERSION}`,
               base: process.env.BRANCH
             })
 
