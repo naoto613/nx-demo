@@ -31,7 +31,7 @@ jobs:
               title: `Bump production ${process.env.CURRENT_VERSION}`,
               body: `Bump production ${process.env.CURRENT_VERSION}`,
               head: staging,
-              base: production
+              base: 'production'
             })
 
 # script: |
