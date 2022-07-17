@@ -24,13 +24,17 @@ jobs:
         id: get_version
         run: echo ::set-output name=VERSION::$( git describe --tags --abbrev=0)
 
+      # - name: Get version
+      #   id: get_version
+      #   run: |
+      #     if [ ${{ github.event.inputs.ref != '' }} ]; then
+      #         echo ::set-output name=VERSION::${{ github.event.inputs.ref }}
+      #     else
+      #         git fetch --tags && echo ::set-output name=VERSION::$( git describe --tags --abbrev=0)
+      #     fi
+
       - name: Test
         run: echo ${{ steps.get_version.outputs.VERSION }}
-
-      - name: Checkout Target Tag Version
-        env:
-          VERSION: ${{ steps.get_version.outputs.VERSION }}
-        run: git checkout ${VERSION}
 
       - name: Push branch
         env:
@@ -38,6 +42,7 @@ jobs:
           VERSION: ${{ steps.get_version.outputs.VERSION }}
         run: |
           git switch -c ${BRANCH}-${VERSION} origin/main
+          git checkout ${VERSION}
           git push -u origin ${BRANCH}-${VERSION}
       - name: Create pull request
         uses: actions/github-script@v6
@@ -50,8 +55,8 @@ jobs:
             github.rest.pulls.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title: `bump ${process.env.BRANCH} v${process.env.VERSION}`,
-              body: `Bump ${process.env.BRANCH} v${process.env.VERSION}`,
+              title: `bump ${process.env.BRANCH} ${process.env.VERSION}`,
+              body: `Bump ${process.env.BRANCH} ${process.env.VERSION}`,
               head: `${process.env.BRANCH}-${process.env.VERSION}`,
               base: process.env.BRANCH
             })
