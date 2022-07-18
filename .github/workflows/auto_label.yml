@@ -17,40 +17,34 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
           NUMBER: ${{ github.event.pull_request.number }}
-          BRANCH_NAME: ${{ github.head_ref }}
-        if: ${{ startsWith($BRANCH_NAME, 'feat/') }}
+        if: ${{ startsWith(github.head_ref, 'feat/') }}
       - run: gh pr edit $NUMBER --add-label chore
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
           NUMBER: ${{ github.event.pull_request.number }}
-          BRANCH_NAME: ${{ github.head_ref }}
-        if: ${{ startsWith($BRANCH_NAME, 'chore/') }}
+        if: ${{ startsWith(github.head_ref, 'chore/') }}
       - run: gh pr edit $NUMBER --add-label release
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
           NUMBER: ${{ github.event.pull_request.number }}
-          BRANCH_NAME: ${{ github.head_ref }}
-        if: ${{ startsWith($BRANCH_NAME, 'release/') }}
+        if: ${{ startsWith(github.head_ref, 'release/') }}
       - run: gh pr edit $NUMBER --add-label bug
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
           NUMBER: ${{ github.event.pull_request.number }}
-          BRANCH_NAME: ${{ github.head_ref }}
-        if: ${{ startsWith($BRANCH_NAME, 'bug/') }}
+        if: ${{ startsWith(github.head_ref, 'bug/') }}
       - run: gh pr edit $NUMBER --add-label documentation
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
           NUMBER: ${{ github.event.pull_request.number }}
-          BRANCH_NAME: ${{ github.head_ref }}
-        if: ${{ startsWith($BRANCH_NAME, 'document/') }}
+        if: ${{ startsWith(github.head_ref, 'document/') }}
       - run: gh pr edit $NUMBER --add-label environment
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
           NUMBER: ${{ github.event.pull_request.number }}
-          BRANCH_NAME: ${{ github.head_ref }}
-        if: ${{ startsWith($BRANCH_NAME, 'environment/') }}
+        if: ${{ startsWith(github.head_ref, 'environment/') }}
