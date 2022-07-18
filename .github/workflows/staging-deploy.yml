@@ -1,12 +1,12 @@
 name: Staging Deploy
 
-on:
-  workflow_dispatch:
-    branches: [main]
+on: workflow_dispatch:
+
 jobs:
   deploy:
     name: Deploy staging
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v3
         with:

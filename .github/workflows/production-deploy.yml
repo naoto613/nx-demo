@@ -1,12 +1,12 @@
 name: Production Deploy
 
-on:
-  workflow_dispatch:
-    branches: [staging]
+on: workflow_dispatch:
+
 jobs:
   deploy:
     name: Deploy production
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v3
         with:
