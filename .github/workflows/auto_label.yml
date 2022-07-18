@@ -6,43 +6,56 @@ jobs:
     name: Auto labeling
     runs-on: ubuntu-20.04
     steps:
-      - run: gh pr edit $NUMBER --add-label feature
-        env:
-          GH_TOKEN: ${{ github.token }}
-          GH_REPO: ${{ github.repository }}
-          NUMBER: ${{ github.event.pull_request.number }}
+      - name: Add feature label
         if: ${{ startsWith(github.head_ref, 'feat/') }}
-      - run: gh pr edit $NUMBER --add-label chore
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
           NUMBER: ${{ github.event.pull_request.number }}
+        run: gh pr edit $NUMBER --add-label feature
+
+      - name: Add chore label
         if: ${{ startsWith(github.head_ref, 'chore/') }}
-      - run: gh pr edit $NUMBER --add-label release
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
           NUMBER: ${{ github.event.pull_request.number }}
+        run: gh pr edit $NUMBER --add-label chore
+
+      - name: Add release label
         if: ${{ startsWith(github.head_ref, 'release/') }}
-      - run: gh pr edit $NUMBER --add-label bug
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
           NUMBER: ${{ github.event.pull_request.number }}
+        run: gh pr edit $NUMBER --add-label release
+
+      - name: Add bug label
         if: ${{ startsWith(github.head_ref, 'bug/') }}
-      - run: gh pr edit $NUMBER --add-label documentation
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
           NUMBER: ${{ github.event.pull_request.number }}
+        run: gh pr edit $NUMBER --add-label bug
+
+      - name: Add documentation label
         if: ${{ startsWith(github.head_ref, 'document/') }}
-      - run: gh pr edit $NUMBER --add-label environment
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
           NUMBER: ${{ github.event.pull_request.number }}
+        run: gh pr edit $NUMBER --add-label documentation
+
+      - name: Add environment label
         if: ${{ startsWith(github.head_ref, 'environment/') }}
-      - uses: dorny/paths-filter@v2
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          NUMBER: ${{ github.event.pull_request.number }}
+        run: gh pr edit $NUMBER --add-label environment
+
+      - name: Check changed file paths
+        uses: dorny/paths-filter@v2
         id: changes
         with:
           filters: |
@@ -52,21 +65,26 @@ jobs:
               - 'apps/frontend/**'
             lambda:
               - 'apps/lambda/**'
-      - if: steps.changes.outputs.backend == 'true'
+      - name: Add backend label
+        if: steps.changes.outputs.backend == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          NUMBER: ${{ github.event.pull_request.number }}
         run: gh pr edit $NUMBER --add-label backend
+
+      - name: Add frontend label
+        if: steps.changes.outputs.frontend == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
           NUMBER: ${{ github.event.pull_request.number }}
-      - if: steps.changes.outputs.frontend == 'true'
         run: gh pr edit $NUMBER --add-label frontend
+
+      - name: Add lambda label
+        if: steps.changes.outputs.lambda == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
           NUMBER: ${{ github.event.pull_request.number }}
-      - if: steps.changes.outputs.lambda == 'true'
         run: gh pr edit $NUMBER --add-label lambda
-        env:
-          GH_TOKEN: ${{ github.token }}
-          GH_REPO: ${{ github.repository }}
-          NUMBER: ${{ github.event.pull_request.number }}
