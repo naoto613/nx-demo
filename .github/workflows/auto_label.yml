@@ -1,0 +1,22 @@
+name: Auto labeling
+
+on:
+  push:
+    branches-ignore:
+      - master
+      - staging
+      - production
+
+jobs:
+  assign:
+    name: Auto labeling
+    runs-on: ubuntu-20.04
+    # if: ${{ github.actor != 'dependabot[bot]' && toJSON(github.event.pull_request.assignees) == '[]' }}
+    steps:
+      - run: echo ${{ github.event.pull_request.head.ref }}
+      # - run: gh pr edit $NUMBER --add-label $LABEL
+      #   env:
+      #     GH_TOKEN: ${{ github.token }}
+      #     GH_REPO: ${{ github.repository }}
+      #     NUMBER: ${{ github.event.pull_request.number }}
+      #     LABEL: ${{ github.event.pull_request.head.ref }}
