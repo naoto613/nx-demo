@@ -8,41 +8,30 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
       GH_REPO: ${{ github.repository }}
+      NUMBER: ${{ github.event.pull_request.number }}
     steps:
       - name: Add feature label
         if: ${{ startsWith(github.head_ref, 'feat/') }}
-        env:
-          NUMBER: ${{ github.event.pull_request.number }}
         run: gh pr edit $NUMBER --add-label feature
 
       - name: Add chore label
         if: ${{ startsWith(github.head_ref, 'chore/') }}
-        env:
-          NUMBER: ${{ github.event.pull_request.number }}
         run: gh pr edit $NUMBER --add-label chore
 
       - name: Add release label
         if: ${{ startsWith(github.head_ref, 'release/') }}
-        env:
-          NUMBER: ${{ github.event.pull_request.number }}
         run: gh pr edit $NUMBER --add-label release
 
       - name: Add bug label
         if: ${{ startsWith(github.head_ref, 'bug/') }}
-        env:
-          NUMBER: ${{ github.event.pull_request.number }}
         run: gh pr edit $NUMBER --add-label bug
 
       - name: Add documentation label
         if: ${{ startsWith(github.head_ref, 'document/') }}
-        env:
-          NUMBER: ${{ github.event.pull_request.number }}
         run: gh pr edit $NUMBER --add-label documentation
 
       - name: Add environment label
         if: ${{ startsWith(github.head_ref, 'environment/') }}
-        env:
-          NUMBER: ${{ github.event.pull_request.number }}
         run: gh pr edit $NUMBER --add-label environment
 
       - name: Check changed file paths
@@ -58,18 +47,12 @@ jobs:
               - 'apps/lambda/**'
       - name: Add backend label
         if: steps.changes.outputs.backend == 'true'
-        env:
-          NUMBER: ${{ github.event.pull_request.number }}
         run: gh pr edit $NUMBER --add-label backend
 
       - name: Add frontend label
         if: steps.changes.outputs.frontend == 'true'
-        env:
-          NUMBER: ${{ github.event.pull_request.number }}
         run: gh pr edit $NUMBER --add-label frontend
 
       - name: Add lambda label
         if: steps.changes.outputs.lambda == 'true'
-        env:
-          NUMBER: ${{ github.event.pull_request.number }}
         run: gh pr edit $NUMBER --add-label lambda
