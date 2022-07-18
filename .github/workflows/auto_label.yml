@@ -1,0 +1,58 @@
+name: Auto labeling
+on: [pull_request]
+
+jobs:
+  assign:
+    name: Auto labeling
+    runs-on: ubuntu-20.04
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      NUMBER: ${{ github.event.pull_request.number }}
+    steps:
+      - name: Add feature label
+        if: ${{ startsWith(github.head_ref, 'feat/') }}
+        run: gh pr edit $NUMBER --add-label feature
+
+      - name: Add chore label
+        if: ${{ startsWith(github.head_ref, 'chore/') }}
+        run: gh pr edit $NUMBER --add-label chore
+
+      - name: Add release label
+        if: ${{ startsWith(github.head_ref, 'release/') }}
+        run: gh pr edit $NUMBER --add-label release
+
+      - name: Add bug label
+        if: ${{ startsWith(github.head_ref, 'bug/') }}
+        run: gh pr edit $NUMBER --add-label bug
+
+      - name: Add documentation label
+        if: ${{ startsWith(github.head_ref, 'document/') }}
+        run: gh pr edit $NUMBER --add-label documentation
+
+      - name: Add environment label
+        if: ${{ startsWith(github.head_ref, 'environment/') }}
+        run: gh pr edit $NUMBER --add-label environment
+
+      - name: Check changed file paths
+        uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          filters: |
+            backend:
+              - 'apps/backend/**'
+            frontend:
+              - 'apps/frontend/**'
+            lambda:
+              - 'apps/lambda/**'
+      - name: Add backend label
+        if: steps.changes.outputs.backend == 'true'
+        run: gh pr edit $NUMBER --add-label backend
+
+      - name: Add frontend label
+        if: steps.changes.outputs.frontend == 'true'
+        run: gh pr edit $NUMBER --add-label frontend
+
+      - name: Add lambda label
+        if: steps.changes.outputs.lambda == 'true'
+        run: gh pr edit $NUMBER --add-label lambda
