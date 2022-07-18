@@ -10,6 +10,10 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.actor != 'dependabot[bot]' }}
     steps:
+      - name: test
+        env:
+          ASSIGNEES: '${{ github.actor }}'
+        run: echo ${ASSIGNEES}
       - name: Set assignees
         env:
           ASSIGNEES: '${{ github.actor }}'
