@@ -1,11 +1,5 @@
 name: Auto labeling
-
-on:
-  push:
-    branches-ignore:
-      - master
-      - staging
-      - production
+on: [pull_request]
 
 jobs:
   assign:
