@@ -1,4 +1,4 @@
-name: Auto labeling
+name: Auto Labeling
 on: [pull_request]
 
 jobs:
