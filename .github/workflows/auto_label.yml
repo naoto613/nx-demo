@@ -14,6 +14,12 @@ jobs:
           GH_REPO: ${{ github.repository }}
           NUMBER: ${{ github.event.pull_request.number }}
       #     LABEL: ${{ github.event.pull_request.head.ref }}
-      - run: echo BRANCH_NAME
+      - run: echo $BRANCH_NAME.split('/')
+        env:
+          BRANCH_NAME: ${{github.head_ref}}
+      - run: echo $BRANCH_NAME.split('/')[0]
+        env:
+          BRANCH_NAME: ${{github.head_ref}}
+      - run: echo $BRANCH_NAME.split('/')[1]
         env:
           BRANCH_NAME: ${{github.head_ref}}
