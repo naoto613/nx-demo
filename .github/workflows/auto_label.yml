@@ -18,7 +18,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
-      #     NUMBER: ${{ github.event.pull_request.number }}
+          NUMBER: ${{ github.event.pull_request.number }}
       #     LABEL: ${{ github.event.pull_request.head.ref }}
       - run: echo BRANCH_NAME
         env:
