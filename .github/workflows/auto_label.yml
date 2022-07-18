@@ -5,21 +5,22 @@ jobs:
   assign:
     name: Auto labeling
     runs-on: ubuntu-20.04
-    # if: ${{ github.actor != 'dependabot[bot]' && toJSON(github.event.pull_request.assignees) == '[]' }}
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      NUMBER: ${{ github.event.pull_request.number }}
+      BRANCH_NAME: ${{ github.head_ref }}
     steps:
+      - run: echo $BRANCH_NAME
+      - run: gh pr edit $NUMBER --add-label feature
+        if: ${{ startsWith($BRANCH_NAME, 'feat/') }}
       - run: gh pr edit $NUMBER --add-label chore
-        # - run: gh pr edit $NUMBER --add-label $LABEL
-        env:
-          GH_TOKEN: ${{ github.token }}
-          GH_REPO: ${{ github.repository }}
-          NUMBER: ${{ github.event.pull_request.number }}
-      #     LABEL: ${{ github.event.pull_request.head.ref }}
-      - run: echo $BRANCH_NAME.split('/')
-        env:
-          BRANCH_NAME: ${{github.head_ref}}
-      - run: echo $BRANCH_NAME.split('/')[0]
-        env:
-          BRANCH_NAME: ${{github.head_ref}}
-      - run: echo $BRANCH_NAME.split('/')[1]
-        env:
-          BRANCH_NAME: ${{github.head_ref}}
+        if: ${{ startsWith($BRANCH_NAME, 'chore/') }}
+      - run: gh pr edit $NUMBER --add-label release
+        if: ${{ startsWith($BRANCH_NAME, 'release/') }}
+      - run: gh pr edit $NUMBER --add-label bug
+        if: ${{ startsWith($BRANCH_NAME, 'bug/') }}
+      - run: gh pr edit $NUMBER --add-label documentation
+        if: ${{ startsWith($BRANCH_NAME, 'document/') }}
+      - run: gh pr edit $NUMBER --add-label environment
+        if: ${{ startsWith($BRANCH_NAME, 'environment/') }}
