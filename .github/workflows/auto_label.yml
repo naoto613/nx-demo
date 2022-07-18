@@ -20,3 +20,4 @@ jobs:
       #     GH_REPO: ${{ github.repository }}
       #     NUMBER: ${{ github.event.pull_request.number }}
       #     LABEL: ${{ github.event.pull_request.head.ref }}
+      - run: gh pr edit $NUMBER --add-label chore
