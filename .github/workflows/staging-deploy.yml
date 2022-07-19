@@ -43,7 +43,7 @@ jobs:
               repo: context.repo.repo,
               title: `Bump staging ${process.env.CURRENT_VERSION}`,
               body: `Bump staging ${process.env.CURRENT_VERSION}`,
-              head: `release/staging-${process.env.CURRENT_VERSION}`,
+              head: `{context.repo.owner}:release/staging-${process.env.CURRENT_VERSION}`,
               base: 'staging'
             })
 
