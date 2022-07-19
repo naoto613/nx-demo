@@ -12,8 +12,6 @@ jobs:
       pull-requests: write
       actions: read
       checks: read
-      contents: read
-      repository-projects: read
       statuses: read
 
     if: ${{ github.actor != 'dependabot[bot]' && toJSON(github.event.pull_request.assignees) == '[]' }}
