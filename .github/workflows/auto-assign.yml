@@ -9,7 +9,7 @@ jobs:
     name: Set assignees
     runs-on: ubuntu-20.04
     permissions:
-      pull-requests: write
+      pull-requests: read
 
     if: ${{ github.actor != 'dependabot[bot]' && toJSON(github.event.pull_request.assignees) == '[]' }}
     steps:
