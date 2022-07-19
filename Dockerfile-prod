@@ -2,7 +2,7 @@
 
 # Package install Layer
 
-FROM node:16.14-slim as node_modules
+FROM node:18.4-slim as node_modules
 
 WORKDIR /app
 
@@ -14,17 +14,17 @@ RUN yarn install --non-interactive --frozen-lockfile --production
 
 # Build Layer
 
-FROM node:16.14-slim as build
+FROM node:18.4-slim as build
 
 WORKDIR /app
 
 # prisma generate に必要
 
 RUN apt-get -qy update && \
- apt-get -qy install \
- openssl --no-install-recommends && \
- apt-get clean && \
- rm -rf /var/lib/apt/lists/\*
+  apt-get -qy install \
+  openssl --no-install-recommends && \
+  apt-get clean && \
+  rm -rf /var/lib/apt/lists/\*
 
 COPY package.json yarn.lock ./
 
@@ -44,21 +44,11 @@ RUN yarn build:api && yarn prisma generate
 
 # FROM gcr.io/distroless/nodejs:16
 
-FROM node:16.14-slim
+FROM node:18.4-slim
 
 WORKDIR /app
 
-# パフォーマンスやセキュリティ関連の最適化を有効にするため
-
 ENV NODE_ENV=production
-
-# prisma の実行に必要
-
-RUN apt-get -qy update && \
- apt-get -qy install \
- openssl --no-install-recommends && \
- apt-get clean && \
- rm -rf /var/lib/apt/lists/\*
 
 # 非 root 権限ユーザーの追加
 
