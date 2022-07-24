@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import * as request from 'supertest';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Authority } from '@prisma/client';
-import { cleanupDatabase } from '../../src/infrastructure/prisma/cleanup-database';
+import { resetTable } from '../../src/infrastructure/prisma/reset-table';
 import { AppModule } from '../../src/app.module';
 import { UserCreateInput } from '../../src/infrastructure/prisma/@generated/user/user-create.input';
 import { userFactory } from '../../src/infrastructure/prisma/factories/users.factory';
@@ -13,7 +13,7 @@ describe('Users', () => {
   let app: INestApplication;
 
   beforeEach(async () => {
-    await cleanupDatabase();
+    await resetTable();
     const module: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();

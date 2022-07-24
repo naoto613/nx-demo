@@ -1,18 +1,19 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { Authority } from '@prisma/client';
 import { UsersRepository } from '../../../src/application/repositories/users.repository';
-import { cleanupDatabase } from '../../../src/infrastructure/prisma/cleanup-database';
 import { UsersRepositoryModule } from '../../../src/infrastructure/ioc/repositories/users.repository.module';
 import prismaService from '../../../src/infrastructure/prisma/prisma-service';
 import { CreateOneUserArgs } from '../../../src/infrastructure/prisma/@generated/user/create-one-user.args';
 import { userFactory } from '../../../src/infrastructure/prisma/factories/users.factory';
 import { UserCreateInput } from '../../../src/infrastructure/prisma/@generated/user/user-create.input';
+import { resetTable } from '../../../src/infrastructure/prisma/reset-table';
 
 describe('UsersRepository', () => {
   let repository: UsersRepository;
 
   beforeEach(async () => {
-    await cleanupDatabase();
+    await resetTable();
+
     const module: TestingModule = await Test.createTestingModule({
       imports: [UsersRepositoryModule],
     }).compile();
