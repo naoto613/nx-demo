@@ -1,0 +1,38 @@
+{
+  "containerDefinitions": [ 
+     { 
+        "name": "api",
+        "command": [
+          "./node_modules/.bin/env-cmd",  "-e", "staging", "node", "dist/apps/backend/main"
+        ],
+        "essential": true,
+        "workingDirectory": ".",
+        "logConfiguration": { 
+           "logDriver": "awslogs",
+           "options": { 
+              "awslogs-group" : "atlas-log-staging",
+              "awslogs-region": "ap-northeast-1",
+              "awslogs-stream-prefix": "api"
+           }
+        },
+        "portMappings": [ 
+           { 
+              "containerPort": 3000,
+              "hostPort": 3000,
+              "protocol": "tcp"
+           }
+        ]
+     }
+  ],
+  "executionRoleArn": "rolearn",
+  "family": "fargate-task-definition",
+  "cpu": "256",
+  "memory": "512",
+  "networkMode": "awsvpc",
+  "runtimePlatform": {
+       "operatingSystemFamily": "LINUX"
+   },
+  "requiresCompatibilities": [ 
+      "FARGATE" 
+   ]
+}

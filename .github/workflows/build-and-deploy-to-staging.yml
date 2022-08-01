@@ -1,0 +1,94 @@
+name: Build and Deploy to staging
+
+on:
+  push:
+    branches:
+      - staging
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build-and-deploy:
+    env:
+      ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY_NAME }}
+      ECS_SERVICE_NAME: ${{ secrets.ECS_SERVICE_NAME_STAGING }}
+      ECS_CLUSTER_NAME: ${{ secrets.ECS_CLUSTER_NAME_STAGING }}
+      ECS_TARGET_GROUP_ARN: ${{ secrets.ECS_TARGET_GROUP_ARN_STAGING }}
+      TASK_ROLE_ARN: ${{ secrets.TASK_ROLE_ARN_STAGING }}
+      NEW_RELIC_APP_ID: ${{ secrets.STAGING_NEW_RELIC_APP_ID }}
+      NEW_RELIC_API_KEY: ${{ secrets.STAGING_NEW_RELIC_API_KEY }}
+      SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+
+    runs-on: ubuntu-22.04
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Get current version
+        id: current_version
+        run: |
+          git fetch --tags
+          echo ::set-output name=VERSION::$( git describe --tags --abbrev=0)
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: $TASK_ROLE_ARN
+          aws-region: ap-northeast-1
+
+      - name: Login to ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: decrypt env file
+        run: |
+          echo "${{ secrets.GPG_PASSPHRASE }}" | sudo gpg --batch --passphrase-fd 0 --output ".env-cmdrc" --decrypt "env/.env-cmdrc.gpg"
+
+      - name: Build and push image to ECR
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ steps.current_version.outputs.VERSION }}
+        run: |
+          docker build . -f Dockerfile-prod -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+      - name: Notify build finished and start deploying
+        run: |
+          curl -XPOST --data-urlencode "payload={\"text\": \"Pushed $IMAGE_TAG image to ECR and start deploying the Atlas-backend-staging\"}" ${SLACK_WEBHOOK}
+
+      - name: Render Amazon ECS task definition
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        id: render-container-api
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: aws/task-definition.json
+          container-name: api
+          image: $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+      - name: Deploy to Amazon ECS service
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.render-container-api-staging.outputs.task-definition }}
+          service: $ECS_SERVICE_NAME
+          cluster: $ECS_CLUSTER_NAME
+          wait-for-service-stability: true
+
+      # - name: New Relic event
+      #   env:
+      #     NEW_RELIC_APP_ID: $NEW_RELIC_APP_ID
+      #     NEW_RELIC_API_KEY: $NEW_RELIC_API_KEY
+      #     BRANCH_NAME: "staging"
+      #   run: script/post_new_relic_event.sh
+
+      - name: Notify failed
+        if: failure()
+        run: |
+          curl -XPOST --data-urlencode "payload={\"text\": \":warning: The VPA-backend-staging deployment failed\"}\" ${SLACK_WEBHOOK}
+
+      - name: Notify successed
+        if: success()
+        run: |
+          curl -XPOST --data-urlencode "payload={\"text\": \":tada: The VPA-backend-staging has been successfully deployed\"}" ${SLACK_WEBHOOK}

@@ -62,6 +62,7 @@ RUN apt-get -qy update && \
 RUN useradd -m myuser && chown -R myuser /app
 
 COPY --from=build --chown=myuser:myuser /app/dist /app/dist
+COPY --from=build --chown=myuser:myuser /app/.env-cmdrc /app/.env-cmdrc
 COPY --from=node_modules /app/node_modules /app/node_modules
 
 # prisma generate で生成したものを copy

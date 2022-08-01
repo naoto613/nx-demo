@@ -6,15 +6,12 @@ services:
       dockerfile: Dockerfile-prod
     tty: true
     stdin_open: true
-        # https://github.com/goldbergyoni/nodebestpractices/blob/6f6acbccb78402594e654b79f689e8537964cb95/sections/docker/bootstrap-using-node.md
-    env_file:
-      - .env.production
     working_dir: /app
     depends_on:
       - mysql
     ports:
       - '3000:3000'
-    command: ["node", "dist/apps/backend/main"]
+    command: ["./node_modules/.bin/env-cmd",  "-e", "production", "node", "dist/apps/backend/main"]
   mysql:
     image: mysql:8.0
     volumes:
