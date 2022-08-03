@@ -50,29 +50,20 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 
-# prisma の実行に必要
-# Perl is required to install openssl
-RUN apt-get update \
-  && apt-get install -y ca-certificates wget bash \
-  && apt-get -qy install perl
-
-# Remove current openssl               
-RUN apt-get -y remove openssl
-
-# This is required to run “tar” command
-RUN apt-get -qy install gcc 
-
-RUN apt-get -q update && apt-get -qy install wget make \
-  && wget https://www.openssl.org/source/openssl-1.1.1o.tar.gz \
-  && tar -xzvf openssl-1.1.1o.tar.gz \
-  && cd openssl-1.1.1o \
+# prismaの実行にLibreSSLが必要
+# 脆弱性対応のため最新バージョンを取得
+RUN apt-get -q update \
+  && apt-get -y remove openssl \
+  && apt-get -qy install gcc wget make \
+  && wget http://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-3.5.3.tar.gz \
+  && tar xvf libressl-3.5.3.tar.gz \
+  && cd libressl-3.5.3 \
   && ./config \
-  && make install \
+  && make && make install && make clean \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/\*
 
 # 非 root 権限ユーザーの追加
-
 RUN useradd -m myuser && chown -R myuser /app
 
 COPY --from=build --chown=myuser:myuser /app/dist /app/dist
