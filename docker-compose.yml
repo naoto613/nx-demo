@@ -3,7 +3,7 @@ services:
   api:
     build:
       context: .
-      dockerfile: Dockerfile-prod
+      dockerfile: Dockerfile-ubunts4
     tty: true
     stdin_open: true
     working_dir: /app
@@ -12,6 +12,7 @@ services:
     ports:
       - '3000:3000'
     command: ["./node_modules/.bin/env-cmd",  "-e", "production", "node", "dist/apps/backend/main"]
+    # command: ["./node_modules/.bin/env-cmd",  "-e", "production", "dist/apps/backend/main"]
   mysql:
     image: mysql:8.0
     volumes:

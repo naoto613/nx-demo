@@ -10,6 +10,7 @@ import { ComplexityPlugin } from './infrastructure/plugins/complexity.plugin';
   imports: [
     GraphQLModule.forRoot({
       driver: ApolloDriver,
+      cache: 'bounded',
       autoSchemaFile: join(
         process.cwd(),
         'apps/backend/src/infrastructure/prisma/schema.gql',
