@@ -4,27 +4,38 @@ import {
   OnModuleInit,
   OnModuleDestroy,
 } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
+import { Prisma, PrismaClient } from '@prisma/client';
 
 @Injectable()
 export class PrismaService
-  extends PrismaClient
+  extends PrismaClient<Prisma.PrismaClientOptions, Prisma.LogLevel>
   implements OnModuleInit, OnModuleDestroy
 {
   // ログ出力用
   constructor() {
     super({
-      log: [
-        { emit: 'event', level: 'query' },
-        { emit: 'stdout', level: 'info' },
-        { emit: 'stdout', level: 'warn' },
-        { emit: 'stdout', level: 'error' },
-      ],
+      log: ['query', 'info', 'warn', 'error'],
       errorFormat: 'pretty',
     });
   }
 
   async onModuleInit() {
+    this.$on('query', (event) => {
+      console.log(
+        `Query: ${event.query}`,
+        `Params: ${event.params}`,
+        `Duration: ${event.duration} ms`,
+      );
+    });
+    this.$on('info', (event) => {
+      console.log(`message: ${event.message}`);
+    });
+    this.$on('error', (event) => {
+      console.log(`error: ${event.message}`);
+    });
+    this.$on('warn', (event) => {
+      console.log(`warn: ${event.message}`);
+    });
     await this.$connect();
   }
 
