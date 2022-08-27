@@ -1,5 +1,6 @@
 import { ArgsType, Field, InputType } from '@nestjs/graphql';
-import { Authority } from '@prisma/client';
+import * as Validator from 'class-validator';
+import { Authority } from '../../infrastructure/prisma/@generated/prisma/authority.enum';
 
 @InputType()
 class SearchInput {
@@ -20,6 +21,15 @@ export class SearchUsersInput {
 
   @Field(() => Number, { nullable: true })
   skip?: number;
+
+  // @Field(() => Number, { nullable: true })
+  // @Validator.IsNumber({maxDecimalPlaces: 2})
+  // @Validator.Max(99)
+  // test?: number;
+
+  // @Field(() => String, { nullable: true })
+  // @Validator.IsDateString()
+  // test?: string;
 
   @Field(() => Number, { nullable: true })
   take?: number;

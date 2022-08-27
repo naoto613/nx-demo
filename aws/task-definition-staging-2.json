@@ -1,0 +1,38 @@
+{
+  "executionRoleArn": "arn:aws:iam::<AWSアカウントID>:role/ecsTaskExecutionRole",
+  "containerDefinitions": [
+    {
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": { 
+          "awslogs-group" : "atlas-log-staging",
+          "awslogs-region": "ap-northeast-1",
+          "awslogs-stream-prefix": "api"
+       }
+      },
+      "portMappings": [
+        {
+          "containerPort": 3000,
+          "hostPort": 3000,
+          "protocol": "tcp"
+        }
+      ],
+      "linuxParameters": null,
+      "workingDirectory": ".",
+      "image": "atlas_staging_image",
+      "essential": true,
+      "name": "api"
+    }
+  ],
+  "taskRoleArn": "arn:aws:iam::<AWSアカウントID>:role/ecsTaskExecutionRole",
+  "family": "atlas-staging",
+  "requiresCompatibilities": [
+    "FARGATE"
+  ],
+  "runtimePlatform": {
+    "operatingSystemFamily": "LINUX"
+  },
+  "networkMode": "awsvpc",
+  "cpu": "256",
+  "memory": "512"
+}

@@ -1,8 +1,14 @@
 #==================================================
 
+# Base image Layer
+
+FROM node:18.4-slim as base
+
+#==================================================
+
 # Package install Layer
 
-FROM node:18-slim as node_modules
+FROM base as node_modules
 
 WORKDIR /app
 
@@ -14,16 +20,9 @@ RUN yarn install --non-interactive --frozen-lockfile --production
 
 # Build Layer
 
-FROM node:18-slim as build
+FROM base as build
 
 WORKDIR /app
-
-# prisma generate に必要
-# RUN apt-get -qy update && \
-#   apt-get -qy install \
-#   openssl --no-install-recommends && \
-#   apt-get clean && \
-#   rm -rf /var/lib/apt/lists/\*
 
 COPY package.json yarn.lock ./
 
@@ -35,30 +34,25 @@ RUN yarn build:api && yarn prisma generate
 
 #==================================================
 
-# Test Layer
-FROM alpine as lib
-
-#==================================================
-
 # Run Layer
-
-# Googleによってメンテンスされている Distroless を使用
-FROM gcr.io/distroless/nodejs:18
+FROM base
 
 WORKDIR /app
 
 ENV NODE_ENV=production
 
-# 各レイヤーからcopy
-# COPY --from=build --chown=nonroot:nonroot /app/dist /app/dist
-# COPY --from=build /app/.env-cmdrc /app/.env-cmdrc
-# COPY --from=build --chown=nonroot:nonroot /app/prisma /app/prisma
-COPY --from=lib /lib/libz.so.1 /lib/libz.so.1
-COPY --from=lib /lib/libc.musl-x86_64.so.1 /lib/libc.musl-x86_64.so.1
+# replace npm in CMD with tini for better kernel signal handling
+RUN apt-get update \
+  && apt-get -qq install -y --no-install-recommends \
+  tini \
+  && rm -rf /var/lib/apt/lists/*
+
+# 非root 権限ユーザーの追加
+RUN useradd -m myuser && chown -R myuser /app
+
 COPY --from=build /app/dist /app/dist
 COPY --from=build /app/.env-cmdrc /app/.env-cmdrc
 COPY --from=build /app/prisma /app/prisma
-COPY --from=node_modules /app/node_modules /app/node_modules
 COPY --from=node_modules /app/node_modules /app/node_modules
 
 # prisma generate で生成したものを copy
@@ -66,5 +60,5 @@ COPY --from=node_modules /app/node_modules /app/node_modules
 COPY --from=build /app/node_modules/@prisma/client /app/node_modules/@prisma/client
 COPY --from=build /app/node_modules/.prisma/client /app/node_modules/.prisma/client
 
-# 特権ユーザーを使用しないためにDistrolessに用意されているユーザーを使用
-# USER nonroot
+USER myuser
+ENTRYPOINT ["/usr/bin/tini", "--"]

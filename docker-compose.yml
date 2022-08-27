@@ -7,6 +7,8 @@ services:
     tty: true
     stdin_open: true
     working_dir: /app
+    environment:
+      - BATCH=true
     depends_on:
       - mysql
     ports:

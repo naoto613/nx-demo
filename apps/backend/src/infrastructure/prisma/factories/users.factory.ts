@@ -1,5 +1,5 @@
-import { Authority } from '@prisma/client';
 import { UserModel } from '../../../domain/models/user.model';
+import { Authority } from '../@generated/prisma/authority.enum';
 import { UserCreateInput } from '../@generated/user/user-create.input';
 import { createFactory } from './create-factory';
 
